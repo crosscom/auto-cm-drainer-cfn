@@ -10,35 +10,35 @@ Mappings:
       ec2: ec2.amazonaws.com
   LayerArn:
     ap-northeast-1:
-      kubectl: 'arn:aws:lambda:ap-northeast-1:903779448426:layer:eks-kubectl-layer:30'
+      kubectl: "arn:aws:lambda:ap-northeast-1:903779448426:layer:eks-kubectl-layer:30"
     ap-northeast-2:
-      kubectl: 'arn:aws:lambda:ap-northeast-2:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:ap-northeast-2:903779448426:layer:eks-kubectl-layer:2"
     ap-southeast-1:
-      kubectl: 'arn:aws:lambda:ap-southeast-1:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:ap-southeast-1:903779448426:layer:eks-kubectl-layer:2"
     ap-southeast-2:
-      kubectl: 'arn:aws:lambda:ap-southeast-2:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:ap-southeast-2:903779448426:layer:eks-kubectl-layer:2"
     ca-central-1:
-      kubectl: 'arn:aws:lambda:ca-central-1:903779448426:layer:eks-kubectl-layer:1'
+      kubectl: "arn:aws:lambda:ca-central-1:903779448426:layer:eks-kubectl-layer:1"
     us-east-1:
-      kubectl: 'arn:aws:lambda:us-east-1:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:us-east-1:903779448426:layer:eks-kubectl-layer:2"
     us-west-1:
-      kubectl: 'arn:aws:lambda:us-west-1:903779448426:layer:eks-kubectl-layer:1'
+      kubectl: "arn:aws:lambda:us-west-1:903779448426:layer:eks-kubectl-layer:1"
     us-west-2:
-      kubectl: 'arn:aws:lambda:us-west-2:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:us-west-2:903779448426:layer:eks-kubectl-layer:2"
     us-east-2:
-      kubectl: 'arn:aws:lambda:us-east-2:903779448426:layer:eks-kubectl-layer:3'
+      kubectl: "arn:aws:lambda:us-east-2:903779448426:layer:eks-kubectl-layer:3"
     eu-central-1:
-      kubectl: 'arn:aws:lambda:eu-central-1:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:eu-central-1:903779448426:layer:eks-kubectl-layer:2"
     eu-west-1:
-      kubectl: 'arn:aws:lambda:eu-west-1:903779448426:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws:lambda:eu-west-1:903779448426:layer:eks-kubectl-layer:2"
     eu-north-1:
-      kubectl: 'arn:aws:lambda:eu-north-1:903779448426:layer:eks-kubectl-layer:1'
+      kubectl: "arn:aws:lambda:eu-north-1:903779448426:layer:eks-kubectl-layer:1"
     sa-east-1:
-      kubectl: 'arn:aws:lambda:sa-east-1:903779448426:layer:eks-kubectl-layer:1'
+      kubectl: "arn:aws:lambda:sa-east-1:903779448426:layer:eks-kubectl-layer:1"
     cn-north-1:
-      kubectl: 'arn:aws-cn:lambda:cn-north-1:937788672844:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws-cn:lambda:cn-north-1:937788672844:layer:eks-kubectl-layer:2"
     cn-northwest-1:
-      kubectl: 'arn:aws-cn:lambda:cn-northwest-1:937788672844:layer:eks-kubectl-layer:2'
+      kubectl: "arn:aws-cn:lambda:cn-northwest-1:937788672844:layer:eks-kubectl-layer:2"
 
 Metadata:
   "AWS::CloudFormation::Interface":
@@ -47,7 +47,7 @@ Metadata:
           default: EKS Cluster
         Parameters:
           - ClusterName
-          - ClusterControlPlaneSecurityGroup
+          # - ClusterControlPlaneSecurityGroup
       - Label:
           default: Worker Node Configuration
         Parameters:
@@ -73,9 +73,9 @@ Parameters:
     Default: ""
     Description: "Arguments to pass to the bootstrap script. See files/bootstrap.sh in https://github.com/awslabs/amazon-eks-ami"
 
-  ClusterControlPlaneSecurityGroup:
-    Type: "AWS::EC2::SecurityGroup::Id"
-    Description: The security group of the cluster control plane.
+  # ClusterControlPlaneSecurityGroup:
+  #   Type: "AWS::EC2::SecurityGroup::Id"
+  #   Description: The security group of the cluster control plane.
 
   ClusterName:
     Type: String
@@ -111,7 +111,7 @@ Parameters:
 
   NodeImageIdSSMParam:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
-    Default: /aws/service/eks/optimized-ami/1.14/amazon-linux-2/recommended/image_id
+    Default: /aws/service/eks/optimized-ami/1.16/amazon-linux-2/recommended/image_id
     Description: AWS Systems Manager Parameter Store parameter of the AMI ID for the worker node instances.
 
   NodeInstanceType:
@@ -123,7 +123,7 @@ Parameters:
       - a1.xlarge
       - a1.2xlarge
       - a1.4xlarge
-      - c1.medium
+      - c1.mediumx
       - c1.xlarge
       - c3.large
       - c3.xlarge
@@ -356,9 +356,24 @@ Parameters:
     Type: "AWS::EC2::VPC::Id"
     Description: The VPC of the worker instances
 
-  LambdaRoleArn:
-    Description: Lambda IAM Role Arn
-    Default: "arn:aws:iam::340256550793:role/AmazonEKSAdminRole"
+  # LambdaRoleArn:
+  #   Description: Lambda IAM Role Arn
+  #   Default: "arn:aws:iam::340256550793:role/AmazonEKSAdminRole"
+  #   Type: String
+
+  LambdaRoleName:
+    Description: Lambda IAM Role Name. This will generate the full LambdaRoleArn.
+    Default: "AmazonEKSAdminRole"
+    Type: String
+
+  EksAuthUpdateApplicationId:
+    Description: Your EKS Auth update hook SAR Application ID
+    Default: "arn:aws:serverlessrepo:ap-northeast-1:903779448426:applications/eks-auth-update-hook-demo"
+    Type: String
+
+  EksAuthUpdateApplicationSemanticVersion:
+    Description: EksAuthHook Application Version
+    Default: "1.0.0"
     Type: String
 
 Conditions:
@@ -368,6 +383,12 @@ Conditions:
         - ""
 
 Resources:
+  ClusterControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster communication with worker nodes
+      VpcId: !Ref VpcId
+
   NodeInstanceRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -518,29 +539,29 @@ Resources:
         MinInstancesInService: !Ref NodeAutoScalingGroupDesiredCapacity
         PauseTime: PT5M
 
-# Custom Resource
+  # Custom Resource
   ConfigMap:
     DependsOn: NodeGroup
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "https://s3-us-west-2.amazonaws.com/pahud-cfn-us-west-2/eks-templates/cloudformation/configmap-sar-stable.yaml"
+      TemplateURL: !Sub "https://s3-us-west-2.amazonaws.com/pahud-cfn-us-west-2/eks-templates/cloudformation/configmap-sar-demo.yaml"
       Parameters:
         RootStackName: !Sub "${AWS::StackName}"
         ClusterName: !Ref ClusterName
         NodeInstanceRoleArn: !GetAtt NodeInstanceRole.Arn
-        LambdaRoleArn: !Ref LambdaRoleArn
+        LambdaRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/${LambdaRoleName}"
         LambdaLayerKubectlArn: !FindInMap
           - LayerArn
-          - !Ref 'AWS::Region'
+          - !Ref "AWS::Region"
           - kubectl
+        ApplicationId: !Ref EksAuthUpdateApplicationId
+        ApplicationSemanticVersion: !Ref EksAuthUpdateApplicationSemanticVersion
         # ApplicationId: !Sub "arn:aws:serverlessrepo:${AWS::Region}:903779448426:applications/eks-auth-update-hook"
+# Outputs:
+#   NodeInstanceRole:
+#     Description: The node instance role
+#     Value: !GetAtt NodeInstanceRole.Arn
 
-
-Outputs:
-  NodeInstanceRole:
-    Description: The node instance role
-    Value: !GetAtt NodeInstanceRole.Arn
-
-  NodeSecurityGroup:
-    Description: The security group for the node group
-    Value: !Ref NodeSecurityGroup
+#   NodeSecurityGroup:
+#     Description: The security group for the node group
+#     Value: !Ref NodeSecurityGroup
