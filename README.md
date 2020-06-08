@@ -46,12 +46,16 @@ copy the `OutputValue`, which represents your `aws-lambda-layer-kubectl` layer v
 
 ## custom your `eks-auth-hook` lambda function
 
+You can customize your business logic in `func.d/main.sh`. Make sure you update `Makefile` before moving to the next step.
+
 ```bash
 cd eksAuthUpdateHook
 #  update the Makefile:
 # `S3BUCKET`: a temp s3 bucket for assets staging, make sure you have read/write permission 
 # `LAMBDA_LAYER_KUBECTL_ARN`: the kubectl arn we just built and deployed
 # `LAMBDA_ROLE_ARN`: the EKS amdin role arn with `aws eks describe-clusters` privileges
+#
+# update func.d/main.sh to customize your business logic
 ```
 
 
