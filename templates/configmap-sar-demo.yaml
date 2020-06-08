@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  ClusterName:
+    Type: String
+    Default: default
+  FunctionName:
+    Type: String
+    Default: defaultFunc
+  NodeInstanceRoleArn:
+    Type: String
+  RootStackName:
+    Type: String
+  LambdaRoleArn:
+    Type: String
+  LambdaLayerKubectlArn:
+    Type: String
+  ApplicationId:
+    Type: String
+  ApplicationSemanticVersion:
+    Type: String
+
+Transform: AWS::Serverless-2016-10-31
+Description: AWS EKS ConfigMap hook for aws-auth-cm
+Resources:
+  ConfigMapUpdate:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        # serverless app from all regoins should be able to import this ApplicationId from 'us-east-1' across accounts.
+        ApplicationId: !Ref ApplicationId
+        SemanticVersion: !Ref ApplicationSemanticVersion
+      Parameters:
+        ClusterName: !Ref ClusterName
+        LambdaRoleArn: !Ref LambdaRoleArn
+        LambdaLayerKubectlArn: !Ref LambdaLayerKubectlArn
+        NodeInstanceRoleArn: !Ref NodeInstanceRoleArn
+        FunctionName: !Sub "eks-auth-update-hook-${AWS::StackName}"
+
+  UpdateCM:
+    Type: Custom::UpdateConfigMap
+    Properties:
+      ServiceToken: !GetAtt ConfigMapUpdate.Outputs.LambdaFuncArn
+      # NodeInstanceRole: xxxxxxxxxxxxxxx
+
+Outputs:
+  LambdaFuncArn:
+    Description: Lambda Func ARN
+    Value: !GetAtt ConfigMapUpdate.Outputs.LambdaFuncArn
+
+  LambdaFuncName:
+    Description: Lambda Func Name
+    Value: !Ref FunctionName
+
+  Result:
+    Description: ConfigMap updat result
+    Value: !GetAtt UpdateCM.Result
