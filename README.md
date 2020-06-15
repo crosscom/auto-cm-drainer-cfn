@@ -62,7 +62,7 @@ cd eksAuthUpdateHook
 ## publish the lambda function as a SAR Application with the kubectl layer
 
 ```bash
-make sam-package sam-publish
+make sam-package sam-deploy
 ```
 
 click the returned URL and copy the ARN of the SAR Applicaiton
