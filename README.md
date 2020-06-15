@@ -23,7 +23,7 @@ This sample walks you through building a cloudformation custom resource that all
 ```bash
 git clone https://github.com/aws-samples/aws-lambda-layer-kubectl.git kubectl-layer
 cd kubectl-layer
-make layer-build sam-layer-deploy
+make layer-build sam-layer-package sam-layer-deploy
 ```
 Response
 ```
